@@ -1,10 +1,13 @@
-using System;
-using ControleEstoque.Models;
+using ControleEstoque.Repository;
+using ControleEstoque.Service;
+using ControleEstoque.ServiceBus;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using System;
 
 namespace ControleEstoque
 {
@@ -20,9 +23,34 @@ namespace ControleEstoque
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            
-            services.AddDbContext<Context>();
-          
+
+            services.AddDbContext<RepositoryContext>();
+
+            services.AddTransient<IRepositoryCRUD, RepositoryCRUD>();
+
+            services.AddTransient<IRepositoryService, RepositoryService>();
+
+            services.AddScoped<IRepositoryChanges, RepositoryChanges>();
+
+            services.AddTransient<IServiceBusController, ServiceBusController>();
+
+            services.AddSingleton<IMessagePublisher, MessagePublisher>();
+
+            services.AddSingleton<MessageConsume>();
+
+            services.AddHostedService<MessageConsume>();
+
+            services.AddSingleton<ITopicClient>(c =>
+                new TopicClient(
+                    Configuration.GetValue<string>("ServiceBus:ConnectionString"),
+                    Configuration.GetValue<string>("ServiceBus:EntityPath")));
+
+            services.AddSingleton<ISubscriptionClient>(c =>
+                new SubscriptionClient(
+                    Configuration.GetValue<string>("ServiceBus:ConnectionString"),
+                    Configuration.GetValue<string>("ServiceBus:EntityPath"),
+                    Configuration.GetValue<string>("ServiceBus:Subscription")));
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo
@@ -39,13 +67,13 @@ namespace ControleEstoque
                     License = new OpenApiLicense
                     {
                         Name = "MIT",
-                        Url = new Uri("https://example.com/license"),
+                        Url = new Uri("/LICENSE.txt"),
                     }
                 });
             });
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment _1)
         {
             app.UseSwagger();
 
@@ -58,8 +86,6 @@ namespace ControleEstoque
             app.UseHttpsRedirection();
 
             app.UseRouting();
-
-            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

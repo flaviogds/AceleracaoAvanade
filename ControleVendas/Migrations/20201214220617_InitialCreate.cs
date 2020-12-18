@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace ControleEstoque.Migrations
+namespace ControleVendas.Migrations
 {
     public partial class InitialCreate : Migration
     {

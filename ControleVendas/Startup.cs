@@ -1,12 +1,13 @@
-using System;
-using System.Reflection;
-using System.IO;
-using ControleEstoque.Models;
+using ControleVendas.Repository;
+using ControleVendas.Service;
+using ControleVendas.ServiceBus;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using System;
 
 namespace ControleVendas
 {
@@ -23,7 +24,32 @@ namespace ControleVendas
         {
             services.AddControllers();
 
-            services.AddDbContext<Context>();
+            services.AddDbContext<RepositoryContext>();
+
+            services.AddTransient<IRepositoryCRUD, RepositoryCRUD>();
+
+            services.AddTransient<IRepositoryService, RepositoryService>();
+
+            services.AddScoped<IRepositoryChanges, RepositoryChanges>();
+
+            services.AddTransient<IServiceBusController, ServiceBusController>();
+
+            services.AddSingleton<IMessagePublisher, MessagePublisher>();
+
+            services.AddSingleton<MessageConsume>();
+
+            services.AddHostedService<MessageConsume>();
+
+            services.AddSingleton<ITopicClient>(c =>
+                new TopicClient(
+                    Configuration.GetValue<string>("ServiceBus:ConnectionString"),
+                    Configuration.GetValue<string>("ServiceBus:EntityPath")));
+
+            services.AddSingleton<ISubscriptionClient>(c =>
+                new SubscriptionClient(
+                    Configuration.GetValue<string>("ServiceBus:ConnectionString"),
+                    Configuration.GetValue<string>("ServiceBus:EntityPath"),
+                    Configuration.GetValue<string>("ServiceBus:Subscription")));
 
             services.AddSwaggerGen(c =>
             {
@@ -47,8 +73,7 @@ namespace ControleVendas
             });
         }
 
-
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment _1)
         {
             app.UseSwagger();
 
@@ -57,7 +82,6 @@ namespace ControleVendas
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Controle de Vendas");
                 c.RoutePrefix = string.Empty;
             });
-
             app.UseHttpsRedirection();
 
             app.UseRouting();
