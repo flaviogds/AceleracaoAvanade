@@ -1,6 +1,5 @@
 ﻿using ControleVendas.Models;
 using ControleVendas.Repository;
-using ControleVendas.ServiceBus;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;

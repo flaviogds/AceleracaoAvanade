@@ -30,22 +30,22 @@ namespace ControleEstoque
 
             services.AddTransient<IRepositoryService, RepositoryService>();
 
-            services.AddScoped<IRepositoryChanges, RepositoryChanges>();
+            services.AddTransient<IRepositoryChanges, RepositoryChanges>();
 
             services.AddTransient<IServiceBusController, ServiceBusController>();
 
-            services.AddSingleton<IMessagePublisher, MessagePublisher>();
+            services.AddTransient<IMessagePublisher, MessagePublisher>();
 
-            services.AddSingleton<MessageConsume>();
+            services.AddTransient<MessageConsume>();
 
             services.AddHostedService<MessageConsume>();
 
-            services.AddSingleton<ITopicClient>(c =>
+            services.AddTransient<ITopicClient>(c =>
                 new TopicClient(
                     Configuration.GetValue<string>("ServiceBus:ConnectionString"),
                     Configuration.GetValue<string>("ServiceBus:EntityPath")));
 
-            services.AddSingleton<ISubscriptionClient>(c =>
+            services.AddTransient<ISubscriptionClient>(c =>
                 new SubscriptionClient(
                     Configuration.GetValue<string>("ServiceBus:ConnectionString"),
                     Configuration.GetValue<string>("ServiceBus:EntityPath"),
@@ -62,12 +62,12 @@ namespace ControleEstoque
                     {
                         Name = "Flávio Santos",
                         Email = "flavio.gds@gmail.com",
-                        Url = new Uri("https://github.com/flaviogds"),
+                        Url = new Uri("https://github.com/flaviogds")
                     },
                     License = new OpenApiLicense
                     {
                         Name = "MIT",
-                        Url = new Uri("/LICENSE.txt"),
+                        Url = new Uri("https://github.com/flaviogds"),
                     }
                 });
             });

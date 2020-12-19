@@ -1,5 +1,6 @@
 ﻿using ControleVendas.Models;
 using ControleVendas.Service;
+using ControleVendas.ServiceBus;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -11,10 +12,12 @@ namespace ControleVendas.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IRepositoryService _repository;
+        private readonly IServiceBusController _serviceBus;
 
-        public ProductController(IRepositoryService repository)
+        public ProductController(IRepositoryService repository, IServiceBusController serviceBus)
         {
             _repository = repository;
+            _serviceBus = serviceBus;
         }
 
         [HttpGet]
@@ -30,9 +33,9 @@ namespace ControleVendas.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<Product>> Put(int id, [FromBody] Product item)
+        public async Task<ProductSale> Put(int id, [FromBody] ProductSale item)
         {
-            return await _repository.UpdateAsync(id, item);
+            return await _serviceBus.Sales(id, item);
         }
     }
 }

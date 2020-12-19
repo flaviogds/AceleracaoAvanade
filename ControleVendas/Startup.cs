@@ -30,22 +30,22 @@ namespace ControleVendas
 
             services.AddTransient<IRepositoryService, RepositoryService>();
 
-            services.AddScoped<IRepositoryChanges, RepositoryChanges>();
+            services.AddTransient<IRepositoryChanges, RepositoryChanges>();
 
             services.AddTransient<IServiceBusController, ServiceBusController>();
 
-            services.AddSingleton<IMessagePublisher, MessagePublisher>();
+            services.AddTransient<IMessagePublisher, MessagePublisher>();
 
-            services.AddSingleton<MessageConsume>();
+            services.AddTransient<MessageConsume>();
 
             services.AddHostedService<MessageConsume>();
 
-            services.AddSingleton<ITopicClient>(c =>
+            services.AddTransient<ITopicClient>(c =>
                 new TopicClient(
                     Configuration.GetValue<string>("ServiceBus:ConnectionString"),
                     Configuration.GetValue<string>("ServiceBus:EntityPath")));
 
-            services.AddSingleton<ISubscriptionClient>(c =>
+            services.AddTransient<ISubscriptionClient>(c =>
                 new SubscriptionClient(
                     Configuration.GetValue<string>("ServiceBus:ConnectionString"),
                     Configuration.GetValue<string>("ServiceBus:EntityPath"),
@@ -73,7 +73,7 @@ namespace ControleVendas
             });
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment _1)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseSwagger();
 

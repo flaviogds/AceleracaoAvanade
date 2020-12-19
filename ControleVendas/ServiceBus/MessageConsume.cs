@@ -21,11 +21,23 @@ namespace ControleVendas.ServiceBus
 
         protected override Task ExecuteAsync(CancellationToken stoppinToken)
         {
-            _subscription.RegisterMessageHandler(async (message, token) =>
-           {
-           var product = JsonSerializer.Deserialize<Product>(message.Body);
+            _subscription.RegisterMessageHandler(async (message, token) => {
+               var product = JsonSerializer.Deserialize<Product>(message.Body);
 
-            await _serviceController.Update(product);
+               switch (message.To.ToString())
+               {
+                   case "storage":
+                       await _serviceController.Add(product);
+                       break;
+                   case "update":
+                       await _serviceController.Update(product);
+                       break;
+                   case "delete":
+                       await _serviceController.Delete(product);
+                       break;
+                   default:
+                       break;
+               }
 
            }, new MessageHandlerOptions(args => Task.CompletedTask));
 
