@@ -2,7 +2,7 @@
 
 namespace ControleVendas.Repository
 {
-    public interface IRepositoryChanges
+    public interface IUnityOfWork
     {
         public Task<int> SubmitChangesAsync();
 

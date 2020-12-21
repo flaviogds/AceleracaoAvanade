@@ -1,11 +1,12 @@
 ﻿using ControleEstoque.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ControleEstoque.Repository
 {
-    public class RepositoryCRUD : IRepositoryCRUD
+    public class RepositoryCRUD : ControllerBase, IRepositoryCRUD
     {
         private readonly RepositoryContext _context;
 
@@ -24,32 +25,31 @@ namespace ControleEstoque.Repository
             return await _context.Produtos.AsNoTracking().FirstOrDefaultAsync(e => e.Id == id);
         }
 
-        public async Task<Product> AddAsync( Product item )
+        public async Task<ActionResult<Product>> AddAsync(Product item )
         {
             if (await _context.Produtos.AnyAsync(e => 
-                e.Id == item.Id 
-               || e.Nome == item.Nome 
-               || e.Quantidade == item.Quantidade)) return null;
+                  e.Nome == item.Nome 
+               || e.Quantidade == item.Quantidade)) return BadRequest("Objet allready exists!");
 
-            await _context.Produtos.AddAsync(item);
+            var response = await _context.Produtos.AddAsync(item);
 
-            return item;
+            return Created("", response.Entity);
         }
 
-        public async Task<Product> UpdateAsync( int id, Product item )
+        public async Task<ActionResult<Product>> UpdateAsync( int id, Product item )
         {
-            if (!await _context.Produtos.AnyAsync(e => e.Id == id)) return null;
+            if(!await _context.Produtos.AnyAsync(e => e.Id == id)) return NotFound();
 
-            _context.Entry(item).State = EntityState.Modified;
+             _context.Entry(item).State = EntityState.Modified;
 
-            return item;
+            return NoContent();
         }
 
         public async Task<Product> DeleteAsync( int? id )
         {
-            Product product = await _context.Produtos.FirstOrDefaultAsync(e => e.Id == id);
+            if (!await _context.Produtos.AnyAsync(e => e.Id == id)) return null;
 
-            if (product == null) return null;
+            var product = await _context.Produtos.FirstOrDefaultAsync(e => e.Id == id);
 
             _context.Produtos.Remove(product);
 

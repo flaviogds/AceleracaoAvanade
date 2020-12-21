@@ -12,9 +12,9 @@ namespace ControleEstoque.ServiceBus
 
         public MessagePublisher(ITopicClient topicClient)
         {
-           _topicClient = topicClient;;
-        }
+           _topicClient = topicClient;
 
+        }
         public Task SendMessage(Product item, string queue)
         {
             var ObjectParse = JsonConvert.SerializeObject(item);

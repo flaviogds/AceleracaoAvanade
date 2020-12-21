@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace ControleVendas.Service
 {
-    public interface IRepositoryService
+    public interface IProductRepository
     {
         public Task<ActionResult<IEnumerable<Product>>> GetAllAsync();
 

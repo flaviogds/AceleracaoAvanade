@@ -1,16 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace ControleEstoque.Repository
 {
-    public class RepositoryChanges : IRepositoryChanges
+    public class UnityOfWork : IUnityOfWork
     {
         private readonly RepositoryContext _context;
 
-        public RepositoryChanges(RepositoryContext context)
+        public UnityOfWork(RepositoryContext context)
         {
             _context = context;
         }

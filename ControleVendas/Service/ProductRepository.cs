@@ -6,21 +6,21 @@ using System.Threading.Tasks;
 
 namespace ControleVendas.Service
 {
-    public class RepositoryService : ControllerBase, IRepositoryService
+    public class ProductRepository : ControllerBase, IProductRepository
     {
         private readonly IRepositoryCRUD _repository;
-        private readonly IRepositoryChanges _repositoryChanges;
+        private readonly IUnityOfWork _repositoryChanges;
 
-        public RepositoryService (
+        public ProductRepository (
             IRepositoryCRUD repository,
-            IRepositoryChanges repositoryChanges)
+            IUnityOfWork repositoryChanges)
         {
             _repository = repository;
             _repositoryChanges = repositoryChanges;
         }
 
         public async Task<ActionResult<IEnumerable<Product>>> GetAllAsync() => Ok(await _repository.GetAllAsync());
-        
+
         public async Task<ActionResult<Product>> GetAsync(int? id) => await _repository.GetAsync(id);
 
         public async Task<Product> AddAsync(Product product)

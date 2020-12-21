@@ -63,11 +63,11 @@ As aplicações ja contem um `Migration` inicial, para criar o arquivo do banco de
 
 **Azure Service Bus**
 
-Foi adotado um único tópico para as duas aplicações e foram criadas 3 subscrições as quais foram atribuídas filtros
+Foi adotado um único tópico para as duas aplicações e foram criadas 2 subscrições as quais foram atribuídas filtros
 de correlação para propriedades personalizadas nos metadados da mensagem. 
 
-  ***controleEstroque**: storage (itens novos), update (itens que foram atualizados)*   
-  ***controleVendas**: sales (itens que foram vendidos)* 
+  ***controleEstroque**: substrico a `sales` (itens que foram vendidos, filtro `sale`)*   
+  ***controleVendas**: subscrito a `storage` (itens criados e modificados, `filtros: storage, update e delete`)* 
 
 ![Model](docs/ModelService.png)
 

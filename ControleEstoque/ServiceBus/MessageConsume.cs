@@ -1,12 +1,12 @@
 ﻿using ControleEstoque.Models;
-using ControleEstoque.ServiceBus;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Hosting;
-using System.Text.Json;
+using Newtonsoft.Json;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ControleEstoque.Service
+namespace ControleEstoque.ServiceBus
 {
     public class MessageConsume : BackgroundService
     {
@@ -22,13 +22,12 @@ namespace ControleEstoque.Service
 
         protected override Task ExecuteAsync(CancellationToken stoppinToken)
         {
-            _subscription.RegisterMessageHandler(async (message, token) =>
-           {
-               var product = JsonSerializer.Deserialize<Product>(message.Body);
+            _subscription.RegisterMessageHandler(async (message, token) => {
+                var product = JsonConvert.DeserializeObject<Product>(Encoding.UTF8.GetString(message.Body));
 
-               await _serviceController.Sales(product);
+                await _serviceController.Sales(product);
 
-           }, new MessageHandlerOptions(args => Task.CompletedTask));
+            }, new MessageHandlerOptions(args => Task.CompletedTask));
 
             return Task.CompletedTask;
         }

@@ -22,7 +22,7 @@ namespace ControleVendas.ServiceBus
             {
                 ContentType = "application/json"
             };
-            message.UserProperties.Add("queue", queue);
+            message.UserProperties.Add("to", queue);
 
             return _topicClient.SendAsync(message);
         }

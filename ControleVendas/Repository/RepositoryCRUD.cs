@@ -9,39 +9,42 @@ namespace ControleVendas.Repository
     {
         private readonly RepositoryContext _context;
 
-        private readonly DbSet<Product> _DbSet;
-
         public RepositoryCRUD(RepositoryContext context)
         {
             _context = context;
-            _DbSet = _context.Set<Product>();
         }
 
         public async Task<IEnumerable<Product>> GetAllAsync()
         {
-            return await _DbSet.AsNoTracking().ToListAsync();
+            var response = await _context.Produtos
+                .AsNoTracking()
+                .ToListAsync();
+
+            return response.FindAll(e => e.Quantidade > 0);
         }
 
         public async Task<Product> GetAsync(int? id)
         {
-            return await _DbSet.AsNoTracking().FirstOrDefaultAsync(e => e.Id == id);
+            return await _context.Produtos
+                .AsNoTracking()
+                .FirstOrDefaultAsync(e => e.Id == id && e.Quantidade > 0);
         }
 
         public async Task<Product> AddAsync( Product item )
         {
-            if (await _DbSet.AnyAsync(e => 
+            if (await _context.Produtos.AnyAsync(e => 
                 e.Id == item.Id 
                || e.Nome == item.Nome 
                || e.Quantidade == item.Quantidade)) return null;
 
-            await _DbSet.AddAsync(item);
+            await _context.Produtos.AddAsync(item);
 
             return item;
         }
 
         public async Task<Product> UpdateAsync( int id, Product item )
         {
-            if (!await _DbSet.AnyAsync(e => e.Id == id)) return null;
+            if (!await _context.Produtos.AnyAsync(e => e.Id == id)) return null;
 
             _context.Entry(item).State = EntityState.Modified;
 
@@ -50,11 +53,11 @@ namespace ControleVendas.Repository
 
         public async Task<Product> DeleteAsync( int? id )
         {
-            Product product = await _DbSet.FirstOrDefaultAsync(e => e.Id == id);
+            if (!await _context.Produtos.AnyAsync(e => e.Id == id)) return null;
 
-            if (product == null) return null;
+            var product = await _context.Produtos.FirstOrDefaultAsync(e => e.Id == id);
 
-            _DbSet.Remove(product);
+            _context.Produtos.Remove(product);
 
             return product;
         }

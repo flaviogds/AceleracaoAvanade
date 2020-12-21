@@ -1,7 +1,8 @@
 ﻿using ControleVendas.Models;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Hosting;
-using System.Text.Json;
+using Newtonsoft.Json;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -22,24 +23,26 @@ namespace ControleVendas.ServiceBus
         protected override Task ExecuteAsync(CancellationToken stoppinToken)
         {
             _subscription.RegisterMessageHandler(async (message, token) => {
-               var product = JsonSerializer.Deserialize<Product>(message.Body);
+                var product = JsonConvert.DeserializeObject<Product>(Encoding.UTF8.GetString(message.Body));
 
-               switch (message.To.ToString())
-               {
-                   case "storage":
-                       await _serviceController.Add(product);
-                       break;
-                   case "update":
-                       await _serviceController.Update(product);
-                       break;
-                   case "delete":
-                       await _serviceController.Delete(product);
-                       break;
-                   default:
-                       break;
-               }
+                message.UserProperties.TryGetValue("to", out var value);
 
-           }, new MessageHandlerOptions(args => Task.CompletedTask));
+                switch (value.ToString())
+                {
+                    case "storage":
+                        await _serviceController.Add(product);
+                        break;
+                    case "update":
+                        await _serviceController.Update(product);
+                        break;
+                    case "delete":
+                        await _serviceController.Delete(product);
+                        break;
+                    default:
+                        break;
+                }
+
+            }, new MessageHandlerOptions(args => Task.CompletedTask));
 
             return Task.CompletedTask;
         }

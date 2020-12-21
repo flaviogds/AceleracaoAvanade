@@ -26,26 +26,26 @@ namespace ControleVendas
 
             services.AddDbContext<RepositoryContext>();
 
-            services.AddTransient<IRepositoryCRUD, RepositoryCRUD>();
+            services.AddScoped<IRepositoryCRUD, RepositoryCRUD>();
 
-            services.AddTransient<IRepositoryService, RepositoryService>();
+            services.AddScoped<IProductRepository, ProductRepository>();
 
-            services.AddTransient<IRepositoryChanges, RepositoryChanges>();
+            services.AddScoped<IUnityOfWork, UnityOfWork>();
 
-            services.AddTransient<IServiceBusController, ServiceBusController>();
+            services.AddSingleton<IServiceBusController, ServiceBusController>();
 
-            services.AddTransient<IMessagePublisher, MessagePublisher>();
+            services.AddSingleton<IMessagePublisher, MessagePublisher>();
 
-            services.AddTransient<MessageConsume>();
+            services.AddSingleton<MessageConsume>();
 
             services.AddHostedService<MessageConsume>();
 
-            services.AddTransient<ITopicClient>(c =>
+            services.AddSingleton<ITopicClient>(c =>
                 new TopicClient(
                     Configuration.GetValue<string>("ServiceBus:ConnectionString"),
                     Configuration.GetValue<string>("ServiceBus:EntityPath")));
 
-            services.AddTransient<ISubscriptionClient>(c =>
+            services.AddSingleton<ISubscriptionClient>(c =>
                 new SubscriptionClient(
                     Configuration.GetValue<string>("ServiceBus:ConnectionString"),
                     Configuration.GetValue<string>("ServiceBus:EntityPath"),
@@ -66,8 +66,8 @@ namespace ControleVendas
                     },
                     License = new OpenApiLicense
                     {
-                        Name = "MIT",
-                        Url = new Uri("https://example.com/license"),
+                        Name = "License MIT",
+                        Url = new Uri("https://github.com/flaviogds/AceleracaoAvanade/blob/master/LICENSE.md"),
                     }
                 });
             });

@@ -4,11 +4,11 @@ using System.Threading.Tasks;
 
 namespace ControleVendas.Repository
 {
-    public class RepositoryChanges : IRepositoryChanges
+    public class UnityOfWork : IUnityOfWork
     {
         private readonly RepositoryContext _context;
 
-        public RepositoryChanges(RepositoryContext context)
+        public UnityOfWork(RepositoryContext context)
         {
             _context = context;
         }
